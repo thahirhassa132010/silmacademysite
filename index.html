@@ -1026,16 +1026,20 @@ let isAdminLoggedIn = false;
 /* ---------------- storage helpers ---------------- */
 async function loadKey(key, fallback) {
   try {
-    const res = await window.storage.get(key, true);
-    if (res && res.value) return JSON.parse(res.value);
+    const doc = await db.collection("siteData").doc(key).get();
+    if (doc.exists && doc.data().data) {
+      return doc.data().data;
+    }
     return fallback;
   } catch (e) {
     return fallback;
   }
 }
+}
 async function saveKey(key, value) {
   try {
-    await window.storage.set(key, JSON.stringify(value), true);
+    await db.collection("siteData").doc(key).set({ data: value }, { merge: true });
+    console.log("Saved " + key + " to the cloud!");
   } catch (e) {
     console.error("Storage save failed for", key, e);
   }
