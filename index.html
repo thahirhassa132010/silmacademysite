@@ -1614,6 +1614,25 @@ document.getElementById("savePassword").addEventListener("click", async () => {
   routeHash();
 })();
 
+// Mobile navigation toggle fix
+document.addEventListener("DOMContentLoaded", () => {
+    const menuToggleBtn = document.getElementById("menuToggle") || document.querySelector(".nav-toggle") || document.body;
+    const mainNav = document.getElementById("mainNav") || document.querySelector("nav") || document.querySelector(".nav-links");
+
+    if (menuToggleBtn && mainNav) {
+        menuToggleBtn.addEventListener("click", (e) => {
+            e.stopPropagation();
+            const isFlex = mainNav.style.display === "flex";
+            mainNav.style.display = isFlex ? "none" : "flex";
+        });
+
+        mainNav.querySelectorAll("a").forEach(link => {
+            link.addEventListener("click", () => {
+                mainNav.style.display = "none";
+            });
+        });
+    }
+});
 </script>
 </body>
 </html>
