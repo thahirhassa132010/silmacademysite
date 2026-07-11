@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -540,7 +541,6 @@
       <a href="#about">About</a>
       <a href="#courses">Courses</a>
       <a href="#hypnotherapy">Wellness</a>
-      <a href="#team">Team</a>
       <a href="#announcements">News</a>
       <a href="#gallery">Gallery</a>
       <a href="#donate">Donate</a>
@@ -927,7 +927,7 @@
       </div>
 
       <div class="admin-panel" id="panel-hypno">
-        <div class="admin-topbar"><h2>Wellness Section (Certified Hypnotic Staff)</h2></div>
+        <div class="admin-topbar"><h2>Certified Hypnotic Staff</h2></div>
         <div class="admin-card">
           <h4>Section Heading</h4>
           <label>Section Title (currently "Certified Hypnotic Staff")</label><input type="text" id="editHypnoSectionTitle">
@@ -957,7 +957,7 @@
           <div style="height:14px;"></div>
           <label>Photo URL</label><input type="text" id="editHypnoTopic2Photo" placeholder="https://...">
         </div>
-        <div class="save-bar"><button class="btn-small" id="saveHypno">Save Wellness Section</button></div>
+        <div class="save-bar"><button class="btn-small" id="saveHypno">Save Certified Hypnotic Staff Section</button></div>
       </div>
 
       <div class="admin-panel" id="panel-team">
@@ -1048,8 +1048,27 @@
   </div>
 </div>
 
-<script>
+<script type="module">
 /* ================= Silm Academy — site + admin logic ================= */
+
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+import {
+  getFirestore, doc, getDoc, setDoc
+} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyCYMgNaRQA9NbMqj6QD1uOA0lby4o_RGo4",
+  authDomain: "silm-academy.firebaseapp.com",
+  projectId: "silm-academy",
+  storageBucket: "silm-academy.firebasestorage.app",
+  messagingSenderId: "316218099516",
+  appId: "1:316218099516:web:7661ccbf03ebfdf07e0039",
+  measurementId: "G-5DVSESGJ80"
+};
+
+const firebaseApp = initializeApp(firebaseConfig);
+const db = getFirestore(firebaseApp);
+const FIRESTORE_COLLECTION = "silmAcademySite";
 
 const DEFAULTS = {
   content: {
@@ -1130,21 +1149,25 @@ const DEFAULTS = {
 let state = JSON.parse(JSON.stringify(DEFAULTS));
 let isAdminLoggedIn = false;
 
-/* ---------------- storage helpers ---------------- */
+/* ---------------- storage helpers (Firebase Firestore — real, permanent storage) ---------------- */
 async function loadKey(key, fallback) {
   try {
-    const res = await window.storage.get(key, true);
-    if (res && res.value) return JSON.parse(res.value);
+    const ref = doc(db, FIRESTORE_COLLECTION, key);
+    const snap = await getDoc(ref);
+    if (snap.exists() && snap.data().value !== undefined) return snap.data().value;
     return fallback;
   } catch (e) {
+    console.error("Firestore load failed for", key, e);
     return fallback;
   }
 }
 async function saveKey(key, value) {
   try {
-    await window.storage.set(key, JSON.stringify(value), true);
+    const ref = doc(db, FIRESTORE_COLLECTION, key);
+    await setDoc(ref, { value: value, updatedAt: new Date().toISOString() });
   } catch (e) {
-    console.error("Storage save failed for", key, e);
+    console.error("Firestore save failed for", key, e);
+    alert("Could not save — check your internet connection and try again. (" + e.message + ")");
   }
 }
 
