@@ -1202,12 +1202,15 @@ function openMobileNav() {
 function closeMobileNav() {
   mainNav.style.display = "none";
 }
-document.getElementById("menuToggle").addEventListener("click", () => {
-  const isOpen = mainNav.style.display === "flex";
-  if (isOpen) closeMobileNav(); else openMobileNav();
-});
-mainNav.querySelectorAll("a").forEach(link => {
-  link.addEventListener("click", () => closeMobileNav());
+const menuToggleBtn = document.getElementById("menuToggle") || document.querySelector(".hamburger");
+if (menuToggleBtn) {
+    menuToggleBtn.addEventListener("click", (e) => {
+        e.stopPropagation();
+        const isOpen = mainNav.style.display === "flex";
+        if (isOpen) closeMobileNav();
+        else openMobileNav();
+    });
+}
 });
 document.addEventListener("click", (e) => {
   if (mainNav.style.display === "flex" && !mainNav.contains(e.target) && e.target.id !== "menuToggle") {
