@@ -1053,12 +1053,13 @@
 
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
 import {
-  getFirestore, doc, getDoc, setDoc
-} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+  getDatabase, ref, get, set
+} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
 
 const firebaseConfig = {
   apiKey: "AIzaSyCYMgNaRQA9NbMqj6QD1uOA0lby4o_RGo4",
   authDomain: "silm-academy.firebaseapp.com",
+  databaseURL: "https://silm-academy-default-rtdb.asia-southeast1.firebasedatabase.app",
   projectId: "silm-academy",
   storageBucket: "silm-academy.firebasestorage.app",
   messagingSenderId: "316218099516",
@@ -1067,8 +1068,8 @@ const firebaseConfig = {
 };
 
 const firebaseApp = initializeApp(firebaseConfig);
-const db = getFirestore(firebaseApp);
-const FIRESTORE_COLLECTION = "silmAcademySite";
+const rtdb = getDatabase(firebaseApp);
+const RTDB_ROOT = "silmAcademySite";
 
 const DEFAULTS = {
   content: {
@@ -1149,24 +1150,26 @@ const DEFAULTS = {
 let state = JSON.parse(JSON.stringify(DEFAULTS));
 let isAdminLoggedIn = false;
 
-/* ---------------- storage helpers (Firebase Firestore — real, permanent storage) ---------------- */
+/* ---------------- storage helpers (Firebase Realtime Database — real, permanent storage) ---------------- */
 async function loadKey(key, fallback) {
   try {
-    const ref = doc(db, FIRESTORE_COLLECTION, key);
-    const snap = await getDoc(ref);
-    if (snap.exists() && snap.data().value !== undefined) return snap.data().value;
+    const safeKey = key.replace(/:/g, "_");
+    const dbRef = ref(rtdb, RTDB_ROOT + "/" + safeKey);
+    const snap = await get(dbRef);
+    if (snap.exists()) return snap.val();
     return fallback;
   } catch (e) {
-    console.error("Firestore load failed for", key, e);
+    console.error("Realtime Database load failed for", key, e);
     return fallback;
   }
 }
 async function saveKey(key, value) {
   try {
-    const ref = doc(db, FIRESTORE_COLLECTION, key);
-    await setDoc(ref, { value: value, updatedAt: new Date().toISOString() });
+    const safeKey = key.replace(/:/g, "_");
+    const dbRef = ref(rtdb, RTDB_ROOT + "/" + safeKey);
+    await set(dbRef, value);
   } catch (e) {
-    console.error("Firestore save failed for", key, e);
+    console.error("Realtime Database save failed for", key, e);
     alert("Could not save — check your internet connection and try again. (" + e.message + ")");
   }
 }
