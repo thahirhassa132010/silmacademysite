@@ -1,6 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
-  <url>
-    <loc>https://thahirhassa132010.github.io/silmacademysite/</loc>
-  </url>
+  <url><loc>https://thahirhassa132010.github.io/silmacademysite/</loc></url>
+  <url><loc>https://thahirhassa132010.github.io/silmacademysite/about.html</loc></url>
+  <url><loc>https://thahirhassa132010.github.io/silmacademysite/courses.html</loc></url>
+  <url><loc>https://thahirhassa132010.github.io/silmacademysite/admissions.html</loc></url>
+  <url><loc>https://thahirhassa132010.github.io/silmacademysite/contact.html</loc></url>
 </urlset>
